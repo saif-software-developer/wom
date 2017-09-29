@@ -29,4 +29,9 @@ public class WOMController {
 	public String latestTweets() {
 		return "latest-tweets";
 	}
+	
+	@GetMapping("/index")
+	public String index() {
+		return "index";
+	}
 }
