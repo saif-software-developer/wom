@@ -6,25 +6,36 @@ var gulp = require('gulp'),
     source = require('vinyl-source-stream'), // for browserify bundle output renaming
     buffer = require('vinyl-buffer'), // for browserify bundle minification
     babelify = require('babelify');
+	//Sass/CSS stuff
+	sass = require('gulp-sass');
 
 // Browserify and minify compiled JavaScript file for node require functionality
 gulp.task('browserify', function() {
-    return browserify('js/Main.jsx')
+	console.log("-> watch me browserify");
+    return browserify('js/components/index.jsx')
         .transform(babelify.configure({
-            presets: ["es2015","react","stage-0"]
+            presets: ["env","react"]
         }))
         .bundle()
-        .pipe(source('bundle.js'))
+        .pipe(source('app.bundle.js'))
         .pipe(buffer()) // convert from streaming to buffered vinyl file object
-        .pipe(rename('bundle.min.js'))
-        .pipe(uglify())
-        .pipe(gulp.dest('js/'));
+        .pipe(gulp.dest('js/dist/'));
+    console.log("-> done with browserify");
 });
 
 // Watch task, to execute just type 'gulp watch'
 gulp.task('watch',function() {
-    gulp.watch('js/**', ['browserify']);
+	gulp.watch('js/sass/**', ['sass']);
+    gulp.watch('js/components/**', ['browserify']);
+});
+
+gulp.task('sass', function () {
+	  console.log("-> watch me getting Sassy");
+	  return gulp.src('js/sass/app.scss')
+	    .pipe(sass().on('error', sass.logError))
+	    .pipe(rename('app.css'))
+	    .pipe(gulp.dest('js/dist/'));
 });
 
 // Default Task, to execute just type 'gulp'
-gulp.task('default', [ 'browserify', 'watch']);
+gulp.task('default', ['sass','browserify', 'watch']);
